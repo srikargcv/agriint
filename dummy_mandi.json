@@ -1,0 +1,105 @@
+{
+ "Guntur": {
+  "state": "Andhra Pradesh",
+  "rates": {
+   "Paddy(Common)": {
+    "modal": 2440,
+    "min": 2300,
+    "max": 2580
+   },
+   "Cotton": {
+    "modal": 8550,
+    "min": 8100,
+    "max": 9000
+   },
+   "Maize": {
+    "modal": 2480,
+    "min": 2480,
+    "max": 2480
+   }
+  }
+ },
+ "Krishna": {
+  "state": "Andhra Pradesh",
+  "rates": {
+   "Paddy(Common)": {
+    "modal": 2456,
+    "min": 2300,
+    "max": 3021
+   },
+   "Maize": {
+    "modal": 2600,
+    "min": 2600,
+    "max": 2600
+   }
+  }
+ },
+ "East Godavari": {
+  "state": "Andhra Pradesh",
+  "rates": {
+   "Paddy(Common)": {
+    "modal": 2441,
+    "min": 2369,
+    "max": 2445
+   },
+   "Maize": {
+    "modal": 2410,
+    "min": 2405,
+    "max": 2410
+   }
+  }
+ },
+ "West Godavari": {
+  "state": "Andhra Pradesh",
+  "rates": {
+   "Paddy(Common)": {
+    "modal": 2369,
+    "min": 2360,
+    "max": 2450
+   }
+  }
+ },
+ "Nellore": {
+  "state": "Andhra Pradesh",
+  "rates": {}
+ },
+ "Chitradurga": {
+  "state": "Karnataka",
+  "rates": {
+   "Maize": {
+    "modal": 2654,
+    "min": 2654,
+    "max": 2654
+   },
+   "Coconut": {
+    "modal": 20000,
+    "min": 20000,
+    "max": 20000
+   }
+  }
+ },
+ "Belagavi": {
+  "state": "Karnataka",
+  "rates": {
+   "Cotton": {
+    "modal": 9500,
+    "min": 9500,
+    "max": 9500
+   },
+   "Tomato": {
+    "modal": 1800,
+    "min": 1800,
+    "max": 1800
+   },
+   "Maize": {
+    "modal": 2640,
+    "min": 2580,
+    "max": 2700
+   }
+  }
+ },
+ "Tiruchirappalli": {
+  "state": "Tamil Nadu",
+  "rates": {}
+ }
+}

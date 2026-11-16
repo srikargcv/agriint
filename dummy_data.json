@@ -1,0 +1,44 @@
+{
+  "crops": ["Paddy", "Cotton", "Tomato", "Chili", "Wheat", "Maize", "Coconut", "Banana", "Groundnut", "Sugarcane", "Onion", "Potato"],
+  "alias": {
+    "Paddy": "Paddy(Common)", "Cotton": "Cotton", "Tomato": "Tomato", "Chili": "Chilli(Red)",
+    "Wheat": "Wheat", "Maize": "Maize", "Coconut": "Coconut", "Banana": "Banana",
+    "Groundnut": "Groundnut (Split)", "Sugarcane": "Sugarcane", "Onion": "Onion", "Potato": "Potato"
+  },
+  "fallback_rates": {
+    "Guntur":        {"Paddy": 2350, "Cotton": 7120, "Tomato": 1850, "Chili": 15400},
+    "Krishna":       {"Paddy": 2380, "Wheat": 2425, "Maize": 2225},
+    "East Godavari": {"Coconut": 3800, "Banana": 3400},
+    "Nellore":       {"Cotton": 7080, "Groundnut": 6750},
+    "West Godavari": {"Paddy": 2360, "Sugarcane": 350},
+    "Chitradurga":   {"Maize": 2100, "Onion": 1600},
+    "Belagavi":      {"Cotton": 6900, "Sugarcane": 320},
+    "Tiruchirappalli": {"Paddy": 2400, "Banana": 3100}
+  },
+  "grades": {"A": 1.08, "B": 1.00, "C": 0.90, "FAQ": 1.00, "Premium": 1.12, "Local": 0.95},
+  "freshness_base": {"A": 1.0, "Premium": 1.0, "B": 0.75, "FAQ": 0.8, "Local": 0.7, "C": 0.45},
+  "perishables": ["Tomato", "Chili", "Banana", "Paddy", "Onion", "Potato"],
+  "weights": {
+    "retail": {"price_fit": 0.35, "freshness": 0.30, "distance": 0.15, "trust": 0.10, "capacity": 0.10},
+    "horeca": {"price_fit": 0.20, "freshness": 0.40, "distance": 0.15, "trust": 0.15, "capacity": 0.10},
+    "export": {"price_fit": 0.15, "freshness": 0.25, "distance": 0.10, "trust": 0.35, "capacity": 0.15}
+  },
+  "vehicles": [
+    {"key": "ace",          "label": "Tata Ace (mini)",        "maker": "Tata Motors",        "payload_q": 10,  "speed_kmh": 55, "cost_km": 11, "cold": false, "use": "light loads, short hops"},
+    {"key": "pickup",       "label": "Mahindra Bolero Pickup", "maker": "Mahindra",           "payload_q": 15,  "speed_kmh": 55, "cost_km": 13, "cold": false, "use": "village-to-hub runs"},
+    {"key": "mini_truck",   "label": "Ashok Leyland Dost",     "maker": "Ashok Leyland",      "payload_q": 30,  "speed_kmh": 50, "cost_km": 17, "cold": false, "use": "mid-size loads, town-to-town"},
+    {"key": "truck",        "label": "Tata LPT 16-ton",        "maker": "Tata Motors",        "payload_q": 160, "speed_kmh": 45, "cost_km": 30, "cold": false, "use": "bulk grain, long haul"},
+    {"key": "reefer_small", "label": "Reefer van (small)",     "maker": "various (G-retail)", "payload_q": 15,  "speed_kmh": 50, "cost_km": 26, "cold": true,  "use": "milk, vegetables, last-mile cold"},
+    {"key": "reefer",       "label": "Eicher reefer truck",    "maker": "Eicher Motors",      "payload_q": 100, "speed_kmh": 45, "cost_km": 34, "cold": true,  "use": "perishables, district-to-city cold chain"}
+  ],
+  "farmers": [
+    ["FRM-001", "Rajesh Singh",    "Kaza",          "Guntur",          16.3067, 80.4365, ["Paddy", "Cotton"],  "Verified"],
+    ["FRM-002", "Lakshmi Krishnan","Tenali",        "Guntur",          16.2375, 80.6494, ["Tomato", "Chili"],  "Verified"],
+    ["FRM-003", "Mohan Patel",     "Bapatla",       "Guntur",          15.9044, 80.4674, ["Paddy"],            "Pending"],
+    ["FRM-004", "Anita Reddy",     "Vijayawada",    "Krishna",         16.5062, 80.6480, ["Wheat", "Maize"],   "Verified"],
+    ["FRM-005", "Suresh Kumar",    "Rajahmundry",   "East Godavari",   17.0005, 81.8040, ["Coconut", "Banana"],"Verified"],
+    ["FRM-006", "Gurpreet Singh",  "Nellore",       "Nellore",         14.4426, 79.9865, ["Cotton", "Groundnut"], "Verified"],
+    ["FRM-007", "Kiran Das",       "Eluru",         "West Godavari",   16.7108, 81.0952, ["Paddy", "Sugarcane"],  "Pending"],
+    ["FRM-008", "Vikram Rao",      "Machilipatnam", "Krishna",         16.1875, 81.1360, ["Paddy"],            "Verified"]
+  ]
+}

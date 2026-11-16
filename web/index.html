@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgriNexus — Ecosystem Intelligence</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #ffffff; --section: #f5f5f7; --ink: #1d1d1f; --muted: #6e6e73;
+    --blue: #0071e3; --blue-dark: #0066cc; --green: #34c759; --red: #ff3b30;
+    --amber: #ff9500; --border: #d2d2d7; --card: #ffffff;
+  }
+  body { background: var(--bg); color: var(--ink); font: 17px/1.47 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+
+  /* nav — apple.com style */
+  nav { position: sticky; top: 0; z-index: 50; background: rgba(251,251,253,.8); backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid rgba(0,0,0,.06); }
+  .nav-inner { max-width: 1100px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; gap: 28px; }
+  .brand { font-size: 21px; font-weight: 700; letter-spacing: -.02em; }
+  .brand em { font-style: normal; color: var(--blue); }
+  .nav-links { display: flex; gap: 26px; margin-left: 12px; }
+  .nav-links a { color: var(--ink); text-decoration: none; font-size: 13px; opacity: .82; cursor: pointer; }
+  .nav-links a:hover { opacity: 1; }
+  .nav-cta { margin-left: auto; }
+
+  .btn { display: inline-block; border: none; cursor: pointer; font-family: inherit;
+    background: var(--blue); color: #fff; border-radius: 980px; padding: 10px 22px;
+    font-size: 14px; font-weight: 500; transition: background .2s; }
+  .btn:hover { background: var(--blue-dark); }
+  .btn.ghost { background: transparent; color: var(--blue); border: 1px solid var(--blue); }
+  .btn.ghost:hover { background: var(--blue); color: #fff; }
+  .btn:disabled { opacity: .45; cursor: wait; }
+  .btn.small { padding: 7px 16px; font-size: 13px; }
+
+  /* hero */
+  .hero { max-width: 1100px; margin: 0 auto; padding: 84px 24px 48px; text-align: center; }
+  .hero .eyebrow { color: var(--blue); font-weight: 600; font-size: 19px; letter-spacing: .01em; }
+  .hero h1 { font-size: 64px; line-height: 1.05; font-weight: 700; letter-spacing: -.03em; margin: 8px 0 16px; }
+  .hero p { font-size: 21px; color: var(--muted); max-width: 720px; margin: 0 auto 28px; }
+  .hero .actions { display: flex; gap: 14px; justify-content: center; }
+  .hero .subtle { margin-top: 14px; font-size: 13px; color: var(--muted); }
+
+  /* sections */
+  section { padding: 72px 24px; }
+  section.tinted { background: var(--section); }
+  .wrap { max-width: 900px; margin: 0 auto; }
+  .section-head { text-align: center; margin-bottom: 44px; }
+  .section-head h2 { font-size: 44px; font-weight: 700; letter-spacing: -.02em; }
+  .section-head p { color: var(--muted); font-size: 19px; margin-top: 8px; }
+
+  /* module tiles — apple grid cards */
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  @media (max-width: 860px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 520px) { .grid { grid-template-columns: 1fr; } }
+  .tile { background: var(--card); border-radius: 18px; padding: 30px 26px; text-align: left;
+    border: 1px solid rgba(0,0,0,.04); box-shadow: 0 2px 12px rgba(0,0,0,.04); transition: transform .25s, box-shadow .25s; }
+  .tile:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,.09); }
+  .tile .icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+    font-size: 22px; margin-bottom: 16px; }
+  .i-blue { background: rgba(0,113,227,.12); } .i-green { background: rgba(52,199,89,.14); }
+  .i-amber { background: rgba(255,149,0,.14); } .i-violet { background: rgba(175,82,222,.13); }
+  .i-red { background: rgba(255,59,48,.12); }
+  .tile h3 { font-size: 21px; font-weight: 600; letter-spacing: -.01em; }
+  .tile .q { color: var(--muted); font-size: 15px; margin: 6px 0 18px; }
+  .tile .meta { font-size: 12px; color: var(--muted); margin-top: 14px; }
+
+  /* results */
+  .results-head { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+  .results-head h2 { font-size: 32px; font-weight: 700; letter-spacing: -.02em; }
+  .panel { background: var(--card); border-radius: 18px; border: 1px solid rgba(0,0,0,.06);
+    box-shadow: 0 2px 12px rgba(0,0,0,.04); padding: 28px; margin-bottom: 20px; }
+  .panel h3 { font-size: 21px; font-weight: 600; margin-bottom: 4px; }
+  .panel .hint { color: var(--muted); font-size: 14px; margin-bottom: 18px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .04em;
+    padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  td { padding: 12px; border-bottom: 1px solid #ececee; }
+  tr:last-child td { border-bottom: none; }
+  .mono { font-family: "SF Mono", Menlo, monospace; font-size: 13px; }
+  .dim { color: var(--muted); }
+
+  .pill { display: inline-block; padding: 3px 11px; border-radius: 980px; font-size: 12px; font-weight: 600; }
+  .p-green { background: rgba(52,199,89,.15); color: #248a3d; }
+  .p-red { background: rgba(255,59,48,.13); color: #d70015; }
+  .p-amber { background: rgba(255,149,0,.15); color: #c93400; }
+  .p-blue { background: rgba(0,113,227,.12); color: var(--blue-dark); }
+
+  .bar { height: 6px; background: #e8e8ed; border-radius: 980px; overflow: hidden; min-width: 48px; max-width: 220px; display: inline-block; vertical-align: middle; margin-left: 8px; }
+  .bar i { display: block; height: 100%; background: var(--green); border-radius: 980px; }
+  .bar.blue i { background: var(--blue); }
+
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 20px; }
+  .kpi { background: var(--card); border-radius: 18px; padding: 22px; border: 1px solid rgba(0,0,0,.05); }
+  .kpi .v { font-size: 34px; font-weight: 700; letter-spacing: -.02em; }
+  .kpi .l { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; margin-top: 2px; }
+
+  pre { background: var(--section); border-radius: 14px; padding: 18px; overflow: auto; font-size: 13px; line-height: 1.55;
+    font-family: "SF Mono", Menlo, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+  #eventlog { max-height: 560px; overflow-y: auto; font-family: "SF Mono", Menlo, monospace; font-size: 12px; border-radius: 14px; background: var(--section); padding: 6px; }
+  .ev { padding: 9px 14px; border-bottom: 1px solid rgba(0,0,0,.05); }
+  .ev:last-child { border-bottom: none; }
+  .ev .t { color: var(--blue-dark); font-weight: 600; margin-right: 8px; }
+  .ev .d { color: var(--muted); }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 16px; margin-top: 10px; }
+  @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } }
+  .form-grid label { display: flex; flex-direction: column; gap: 5px; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .form-grid input, .form-grid select {
+    font: inherit; font-size: 14px; color: var(--ink); background: var(--section);
+    border: 1px solid transparent; border-radius: 10px; padding: 10px 12px; outline: none; transition: .15s;
+    height: 44px; width: 100%;
+  }
+  .form-grid input:focus, .form-grid select:focus { border-color: var(--blue); background: #fff;
+    box-shadow: 0 0 0 3px rgba(0,113,227,.18); }
+
+  footer { text-align: center; padding: 40px 24px 56px; color: var(--muted); font-size: 13px; }
+  .cols { display: grid; grid-template-columns: 1fr; gap: 20px; align-items: start; }
+  .cols > * { min-width: 0; }
+  #content, .panel { min-width: 0; max-width: 100%; }
+  @media (max-width: 900px) {
+    .hero h1 { font-size: 42px; } .cols { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="brand">Agri</div>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="eyebrow">Ecosystem Intelligence</div>
+  <h1>Four models.<br>One event stream.</h1>
+  <p>Matching, fair pricing, logistics, and trust — the full farmer-to-delivery
+     pipeline, running live against the farmer records. Click a module to test it.</p>
+  <div class="actions">
+    <button class="btn" onclick="runStage('all')">▶ Run the full pipeline</button>
+    <button class="btn ghost" onclick="runStage('matching')">Try Matching</button>
+  </div>
+  <div class="subtle">Seeded with 8 farmers · 14 lots · 16 orders from the admin dashboard</div>
+</div>
+
+<section class="tinted" id="modules">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>The four stations.</h2>
+      <p>Each one reads the event stream, decides, and publishes back.</p>
+    </div>
+    <div class="grid">
+      <div class="tile" onclick="runStage('matching')" style="cursor:pointer">
+        <div class="icon i-blue">⇄</div>
+        <h3>Matching</h3>
+        <p class="q">Which buyer gets which lot?</p>
+        <button class="btn small ghost">Run</button>
+        <div class="meta">pairs every lot with its best buyer</div>
+      </div>
+      <div class="tile" onclick="runStage('pricing')" style="cursor:pointer">
+        <div class="icon i-green">₹</div>
+        <h3>Pricing</h3>
+        <p class="q">Is the price fair to the farmer?</p>
+        <button class="btn small ghost">Run</button>
+        <div class="meta">checks every offer against the market rate</div>
+      </div>
+      <div class="tile" onclick="runStage('logistics')" style="cursor:pointer">
+        <div class="icon i-violet">➤</div>
+        <h3>Logistics</h3>
+        <p class="q">Cheapest route that won't spoil cargo?</p>
+        <button class="btn small ghost">Run</button>
+        <div class="meta">plans trips that keep produce fresh</div>
+      </div>
+      <div class="tile" onclick="runStage('trust')" style="cursor:pointer">
+        <div class="icon i-amber">🛡</div>
+        <h3>Trust & Fraud</h3>
+        <p class="q">Can we trust this actor?</p>
+        <button class="btn small ghost">Run</button>
+        <div class="meta">sealed crop records · warnings on bad behaviour</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="custom">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Run a test scenario.</h2>
+      <p>Enter a lot and an order — every model scores the input. Prices are real Agmarknet mandi
+         rates; towns and distances use 3,184 real Indian locations.</p>
+    </div>
+    <div class="panel">
+      <h3>Lot — farmer side</h3>
+      <p class="hint">what the farmer lists</p>
+      <div class="form-grid">
+        <label>Crop <select id="c_crop"></select></label>
+        <label>District <select id="c_district"></select></label>
+        <label>Quantity (quintals) <input id="c_qty" type="number" value="50" step="0.1"></label>
+        <label>Grade <select id="c_grade"></select></label>
+        <label>Asking price (₹/q) <input id="c_price" type="number" value="1750"></label>
+        <label>Farm town <input id="c_town" list="townlist" placeholder="type a town, e.g. Tenali" oninput="searchTowns()">
+          <datalist id="townlist"></datalist></label>
+        <label>Farm latitude <input id="c_lat" type="number" value="16.24" step="0.0001"></label>
+        <label>Farm longitude <input id="c_lng" type="number" value="80.64" step="0.0001"></label>
+        <label>Freshness note <input id="c_fresh" type="text" value="harvested this morning, firm texture"></label>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Order — buyer side</h3>
+      <p class="hint">what the buyer wants</p>
+      <div class="form-grid">
+        <label>Buyer type <select id="c_cls"><option value="retail">Retail</option><option value="horeca" selected>HoReCa</option><option value="export">Export</option></select></label>
+        <label>Order quantity (q) <input id="c_oqty" type="number" value="50" step="0.1"></label>
+        <label>Max price (₹/q) <input id="c_maxp" type="number" value="1900"></label>
+        <label>Min trust required <input id="c_mintrust" type="number" value="0" min="0" max="1" step="0.05"></label>
+        <label>Delivery district <select id="c_delivery"></select></label>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Run parameters</h3>
+      <p class="hint">knobs the platform controls</p>
+      <div class="form-grid">
+        <label>Offer price (₹/q) <input id="c_offer" type="number" value="1800"></label>
+        <label>Ambient temp (°C) <input id="c_temp" type="number" value="32"></label>
+        <label>Farmer trust score <input id="c_trust" type="number" value="0.7" min="0" max="1" step="0.05"></label>
+        <label>Delivery outcome (0–1) <input id="c_outcome" type="number" value="0.9" min="0" max="1" step="0.05"></label>
+        <label>Vehicle <select id="c_vehicle"></select></label>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Fraud probes <span class="dim" style="font-weight:400;font-size:13px">(optional)</span></h3>
+      <p class="hint">leave blank to skip a check</p>
+      <div class="form-grid">
+        <label>Pickup weight (q) <input id="c_pq" type="number" placeholder="50" step="0.1"></label>
+        <label>Delivery weight (q) <input id="c_dq" type="number" placeholder="47" step="0.1"></label>
+        <label>GPS latitude <input id="c_glat" type="number" placeholder="16.25" step="0.0001"></label>
+        <label>GPS longitude <input id="c_glng" type="number" placeholder="80.65" step="0.0001"></label>
+      </div>
+      <div style="margin-top:26px"><button class="btn" onclick="runCustom()">▶ Run test</button></div>
+    </div>
+  </div>
+</section>
+
+<section id="output">
+  <div class="wrap">
+    <div class="results-head"><h2 id="out-title">Results</h2><span class="dim" id="out-sub">run a module above</span></div>
+    <div class="cols">
+      <div id="content">
+        <div class="panel">
+          <h3>Nothing run yet</h3>
+          <p class="hint">Pick a module from the grid, the nav, or the hero — results land here,
+             and every event appears in the stream on the right.</p>
+        </div>
+      </div>
+      <div>
+        <div class="kpis" id="kpis"></div>
+        <div class="panel">
+          <h3>Activity</h3>
+          <p class="hint">everything that happened, step by step</p>
+          <div id="eventlog"><div class="ev"><span class="d">waiting for a run…</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>AgriNexus Prototype · matching · pricing · logistics · trust · fraud — demo build</footer>
+
+<script>
+const $ = s => document.querySelector(s);
+
+async function loadOptions() {
+  const r = await (await fetch('/api/options')).json();
+  VEHICLES = Object.fromEntries(r.vehicles.map(v => [v.key, v.label]));
+  document.getElementById('c_crop').innerHTML = r.crops.map(c => `<option>${esc(c)}</option>`).join('');
+  document.getElementById('c_grade').innerHTML = r.grades.map((g,i) => `<option${g==='FAQ'?' selected':''}>${g}</option>`).join('');
+  const groups = {};
+  r.districts.forEach(d => (groups[d.state] = groups[d.state] || []).push(d.name));
+  const districtOptions = Object.entries(groups).map(([st, ds]) =>
+    `<optgroup label="${esc(st)}">` + ds.map(d => `<option>${esc(d)}</option>`).join('') + '</optgroup>').join('');
+  document.getElementById('c_district').innerHTML = districtOptions;
+  document.getElementById('c_delivery').innerHTML = districtOptions;
+  document.getElementById('c_vehicle').innerHTML =
+    `<option value="">Auto — let the engine choose</option>` +
+    r.vehicles.map(v => `<option value="${esc(v.key)}">${esc(v.label)} — carries ${v.cap} q${v.cold ? ', refrigerated' : ''}</option>`).join('');
+}
+loadOptions();
+const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const pill = (txt, cls) => `<span class="pill p-${cls}">${esc(txt)}</span>`;
+const bar = (v, blue) => `<div class="bar${blue?' blue':''}"><i style="width:${Math.round(v*100)}%"></i></div>`;
+const inr = n => '₹' + Number(n).toLocaleString('en-IN');
+
+const FRIENDLY = {
+  'match.confirmed':'Match made', 'price.banded':'Price checked', 'price.alert':'Price warning',
+  'route.planned':'Route planned', 'route.rerouted':'Route changed', 'trust.updated':'Trust updated',
+  'ledger.appended':'Record added', 'fraud.flagged':'Fraud alert', 'settlement.held':'Payment held',
+  'cycle.completed':'Pipeline finished',
+};
+const FACTORS = {price_fit:'Price fit', freshness:'Freshness', distance:'Distance',
+                 trust:'Trust', capacity:'Quantity fit'};
+let VEHICLES = {};
+
+function kpis(list) {
+  $('#kpis').innerHTML = list.map(k => `<div class="kpi"><div class="v" style="color:${k.c||'var(--ink)'}">${k.v}</div><div class="l">${esc(k.l)}</div></div>`).join('');
+}
+function logEvents(evs) {
+  $('#eventlog').innerHTML = (evs||[]).map(e => {
+    const p = e.payload || {};
+    let detail = '';
+    if (p.score !== undefined) detail = 'score ' + p.score;
+    else if (p.floor_gross) detail = 'fair band ₹' + Number(p.floor_gross).toLocaleString('en-IN') + '–₹' + Number(p.ceiling_gross).toLocaleString('en-IN');
+    else if (p.distance_km !== undefined) detail = p.distance_km + ' km';
+    else if (p.new_score !== undefined) detail = 'trust now ' + p.new_score;
+    else if (p.rule) detail = p.detail || p.rule;
+    else if (p.stage) detail = p.stage;
+    else if (p.reason) detail = p.reason;
+    return `<div class="ev"><span class="t">${FRIENDLY[e.type] || e.type}</span><span class="d">${esc(detail)}</span></div>`;
+  }).join('') || '<div class="ev"><span class="d">no events</span></div>';
+  $('#eventlog').scrollTop = 0;
+}
+function show(title, sub, html) {
+  $('#out-title').textContent = title;
+  $('#out-sub').textContent = sub;
+  $('#content').innerHTML = html;
+  document.getElementById('output').scrollIntoView({behavior:'smooth'});
+}
+
+async function runStage(stage) {
+  document.querySelectorAll('button').forEach(b => b.disabled = true);
+  show('Running…', stage, '<div class="panel"><h3>Working</h3></div>');
+  try {
+    const r = await (await fetch('/api/run/' + stage)).json();
+    if (stage === 'all') renderMatching(r.matching, true);
+    else if (stage === 'matching') renderMatching(r);
+    else if (stage === 'pricing') renderPricing(r);
+    else if (stage === 'logistics') renderLogistics(r);
+    else if (stage === 'trust') renderTrust(r);
+    else if (stage === 'fraud') renderFraud(r);
+    logEvents(stage === 'all'
+      ? [...r.matching.events, ...r.pricing.events, ...r.logistics.events, ...r.trust.events, ...r.fraud.events]
+      : r.events);
+  } catch (e) {
+    show('Error', '', `<div class="panel"><pre>${esc(e)}</pre></div>`);
+  }
+  document.querySelectorAll('button').forEach(b => b.disabled = false);
+}
+
+function renderMatching(r, isAll) {
+  kpis([{v: r.matches.length, l: 'matches found', c: 'var(--green)'},
+        {v: r.lots_total ?? '—', l: 'farmer lots'},{v: r.orders_total ?? '—', l: 'buyer orders'}]);
+  show(isAll ? 'Matches found' : 'Matching', 'best farmer–buyer pairs, picked as a whole', `
+    <div class="panel"><h3>Who trades with whom</h3>
+    <p class="hint">each score weighs price, freshness, distance, trust and quantity</p>
+    <table><tr><th>Lot</th><th>Crop</th><th>Farmer</th><th>Order</th><th>Score</th><th>Strongest reasons</th></tr>
+    ${r.matches.map(m => `<tr><td class="mono">${m.lot_id}</td><td>${esc(m.crop)}</td>
+      <td>${esc(m.farmer)}</td><td class="mono">${m.order_id}</td>
+      <td>${m.score} ${bar(m.score, true)}</td>
+      <td class="dim">${Object.entries(m.subsignals).sort((a,b)=>b[1]-a[1]).slice(0,2).map(([k,v])=>(FACTORS[k]||k).toLowerCase()+' '+v).join(', ')}</td></tr>`).join('')}
+    </table></div>`);
+}
+
+function renderPricing(r) {
+  const rows = Object.values(r.priced);
+  kpis([{v: rows.length, l: 'prices checked'}, {v: rows.filter(p=>!p.within_band).length, l: 'unfair offers', c: 'var(--red)'},
+        {v: rows.filter(p=>p.within_band).length, l: 'fair offers', c: '#248a3d'}]);
+  show('Pricing', 'is the offer fair to the farmer?', `
+    <div class="panel"><h3>Fair price check</h3>
+    <p class="hint">each crop has a market rate; the fair range sits a little above and below it</p>
+    <table><tr><th>Lot</th><th>Crop</th><th>Grade</th><th>Market rate</th><th>Fair range</th><th>Offer</th><th>Status</th></tr>
+    ${rows.map(p => `<tr><td class="mono">${p.lot_id}</td><td>${esc(p.crop)}</td><td>${p.grade}</td>
+      <td>${inr(p.mandi_ref)}</td><td>${inr(p.floor_gross)} – ${inr(p.ceiling_gross)}</td>
+      <td>${inr(p.offer_price)}</td><td>${p.within_band ? pill('FAIR','green') : pill('UNFAIR','red')}</td></tr>`).join('')}
+    </table></div>
+    <div class="panel"><h3>What the farmer is told</h3>
+    <p class="hint">a plain-language message generated for every price check</p>
+    <pre>${esc(rows[0].explanation)}</pre></div>`);
+}
+
+function renderLogistics(r) {
+  kpis([{v: r.routes.length, l: 'trips planned'}, {v: r.routes.filter(p=>p.reroute_reason).length, l: 'needed a change', c: '#c93400'},
+        {v: Math.round(r.routes.reduce((a,p)=>a+p.distance_km,0)), l: 'total km'}]);
+  show('Logistics', 'the cheapest trip that keeps produce fresh', `
+    <div class="panel"><h3>Trips</h3>
+    <p class="hint">perishable loads get refrigerated vehicles first; risky trips get re-planned</p>
+    ${r.routes.map(p => {
+      const hrs = Math.round(p.transit_min) < 60 ? Math.round(p.transit_min) + ' minutes'
+        : (p.transit_min/60).toFixed(1) + ' hours';
+      const dist = p.distance_km < 1 ? 'right in town' : p.distance_km + ' km';
+      const spoil = Math.round(p.spoilage_risk*100);
+      const status = p.reroute_reason ? pill('NEEDS RE-PLANNING','amber') : pill('FINE','green');
+      return `<p style="padding:12px 0;border-bottom:1px solid #ececee">
+        A <b>${VEHICLES[p.vehicle]||p.vehicle}</b> makes <b>${p.stops.length} pickup${p.stops.length>1?'s':''}</b>
+        (${p.stops.join(', ')}) in <b>${esc(p.district)}</b> — <b>${dist}</b>, about
+        <b>${hrs}</b> on the road. Chance of produce spoiling: <b>${spoil}%</b>. ${status}</p>`;
+    }).join('')}</div>`);
+}
+
+function renderTrust(r) {
+  kpis([{v: r.ledger_intact ? 'SAFE' : 'TAMPERED', l: 'crop record', c: r.ledger_intact?'#248a3d':'var(--red)'},
+        {v: r.trust_trajectory.values.at(-1), l: 'trust after 3 good deliveries', c: 'var(--blue)'}]);
+  show('Trust', 'a tamper-proof record of every crop, and a living trust score', `
+    <div class="panel"><h3>The crop's journey, sealed at every step</h3>
+    <p class="hint">sowing → harvest → pickup → cold storage → delivery · any later edit breaks the seal</p>
+    <table><tr><th>Step</th><th>Seal</th></tr>
+    ${r.ledger_chain.map(c => `<tr><td>${c.stage.replace('_',' ')}</td><td class="mono">${c.hash}</td></tr>`).join('')}
+    </table></div>
+    <div class="panel"><h3>How ${esc(r.trust_trajectory.farmer)}'s trust grows</h3>
+    <p class="hint">good deliveries raise it; problems pull it back</p>
+    <table><tr><th>Event</th><th>Trust</th></tr>
+    ${r.trust_trajectory.values.map((v,i) => `<tr><td>${i===0?'starting score':'good delivery '+i}</td><td>${v} ${bar(v, true)}</td></tr>`).join('')}
+    </table></div>`);
+}
+
+async function searchTowns() {
+  const q = document.getElementById('c_town').value.trim();
+  if (q.length < 2) return;
+  const r = await (await fetch('/api/cities?q=' + encodeURIComponent(q))).json();
+  window._towns = r.cities || [];
+  document.getElementById('townlist').innerHTML = window._towns.map((c, i) =>
+    `<option value="${esc(c.name)} (${esc(c.state)})" data-i="${i}">`).join('');
+}
+document.addEventListener('input', e => {
+  if (e.target.id !== 'c_town' || !window._towns) return;
+  const sel = window._towns.find(c => e.target.value.startsWith(c.name + ' ('));
+  if (sel) { document.getElementById('c_lat').value = sel.lat;
+             document.getElementById('c_lng').value = sel.lng; }
+});
+
+async function runCustom() {
+  const val = id => document.getElementById(id).value.trim();
+  const body = {
+    crop: val('c_crop'), district: val('c_district'),
+    quantity_q: val('c_qty'), grade: val('c_grade'),
+    freshness_desc: val('c_fresh'), lat: val('c_lat'), lng: val('c_lng'),
+    list_price: val('c_price'),
+    stakeholder_class: val('c_cls'), order_quantity_q: val('c_oqty'),
+    max_price: val('c_maxp'), min_trust: val('c_mintrust'),
+    delivery_district: val('c_delivery'),
+    offer_price: val('c_offer'), max_temp: val('c_temp'), vehicle: val('c_vehicle'),
+    trust_score: val('c_trust'), outcome: val('c_outcome'),
+  };
+  for (const [id, key] of [['c_pq','pickup_q'],['c_dq','delivery_q'],['c_glat','gps_lat'],['c_glng','gps_lng']]) {
+    const v = val(id); if (v) body[key] = v;
+  }
+  document.querySelectorAll('button').forEach(b => b.disabled = true);
+  show('Scoring test data…', 'test run', '<div class="panel"><h3>Working</h3></div>');
+  try {
+    const resp = await fetch('/api/run/custom', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+    const r = await resp.json();
+    if (!resp.ok) throw new Error(r.error || resp.status);
+    renderCustom(r);
+    logEvents(r.events);
+  } catch (e) {
+    show('Error', '', `<div class="panel"><pre>${esc(e.message || e)}</pre></div>`);
+  }
+  document.querySelectorAll('button').forEach(b => b.disabled = false);
+}
+
+function renderCustom(r) {
+  const m = r.match, pr = r.pricing, rt = r.route, t = r.trust, f = r.fraud.flags;
+  const pct = v => Math.round(v*100) + '%';
+  kpis([
+    {v: m.score, l: 'match score', c: m.passed ? 'var(--blue)' : 'var(--red)'},
+    {v: pr.within_band ? 'FAIR' : 'UNFAIR', l: 'price', c: pr.within_band ? '#248a3d' : 'var(--red)'},
+    {v: pct(rt.spoilage_risk), l: 'spoil chance', c: rt.spoilage_risk > 0.4 ? '#c93400' : 'var(--ink)'},
+    {v: f.length, l: 'warnings', c: f.length ? 'var(--red)' : '#248a3d'},
+    {v: t.after, l: 'trust after', c: 'var(--blue)'},
+  ]);
+  show('Test result', `${r.inputs.lot.crop} in ${r.inputs.lot.district} · ${r.inputs.order.stakeholder_class} buyer · offer ${inr(pr.offer_price)}`, `
+    <div class="panel"><h3>1 · Do they match?</h3>
+      <p>${m.passed
+        ? pill('YES — GOOD MATCH','green') + ` <span class="dim">overall score ${m.score} out of 1</span>`
+        : pill('NO — REJECTED','red') + ' <span class="dim">one or more requirements failed</span>'}</p>
+      <table style="margin-top:14px"><tr><th>What we checked</th><th>How it scored</th></tr>
+      ${Object.entries(m.subsignals).sort((a,b)=>b[1]-a[1]).map(([k,v]) =>
+        `<tr><td>${FACTORS[k]||k}</td><td>${v} ${bar(v, true)}</td></tr>`).join('')}
+      </table></div>
+    <div class="panel"><h3>2 · Is the price fair?</h3>
+      <p>The market rate for ${esc(pr.crop)} is <b>${inr(pr.mandi_ref)}/quintal</b>, so the fair range is
+      <b>${inr(pr.floor_gross)}–${inr(pr.ceiling_gross)}</b>. The offer of <b>${inr(pr.offer_price)}</b> is
+      ${pr.within_band ? 'inside that range — ' + pill('FAIR','green') : 'outside that range — ' + pill('UNFAIR','red')}.</p>
+      <pre style="margin-top:12px">${esc(pr.explanation)}</pre></div>
+    <div class="panel"><h3>3 · How does it get there?</h3>
+      <p>A <b>${VEHICLES[rt.vehicle]||rt.vehicle}</b> collects the produce from the farm in
+      <b>${esc(rt.origin_district)}</b> and delivers it to <b>${esc(rt.district)}</b> —
+      <b>${rt.distance_km} km</b>, about <b>${Math.round(rt.transit_min)} minutes</b> on the road.
+      Chance of the produce spoiling: <b>${pct(rt.spoilage_risk)}</b>.
+      ${rt.spoilage_risk > 0.4 ? pill('NEEDS A REFRIGERATED RE-RUN','amber') : pill('FINE','green')}</p></div>
+    <div class="panel"><h3>4 · Trust & safety</h3>
+      <p>Trust moves from <b>${t.before}</b> to <b>${t.after}</b> after this delivery (${t.outcome} rated).</p>
+      ${f.length
+        ? '<p style="margin-top:10px">Warnings raised:</p><table style="margin-top:8px"><tr><th>Check</th><th>What happened</th></tr>'
+          + f.map(x => `<tr><td>${pill(x.rule,'red')}</td><td>${esc(x.detail)}</td></tr>`).join('') + '</table>'
+        : '<p style="margin-top:10px">' + pill('NO WARNINGS','green') + '</p>'}</div>`);
+}
+
+function renderFraud(r) {
+  kpis([{v: r.flags.length, l: 'problems caught', c: 'var(--red)'},
+        {v: r.flags.length ? 'PAYMENT HELD' : 'CLEAR', l: 'result', c: r.flags.length ? '#c93400' : '#248a3d'}]);
+  show('Fraud checks', 'five sneaky behaviours we test for', `
+    <div class="panel"><h3>Problems caught</h3>
+    <p class="hint">stolen weight at delivery · wildly off-market prices · serial order-cancelling ·
+    trucks nowhere near the farm · the same few traders selling in a circle to fake volume</p>
+    <table><tr><th>Check</th><th>Who</th><th>What happened</th></tr>
+    ${r.flags.map(f => `<tr><td>${pill(f.rule,'red')}</td><td class="mono">${f.lot_id}</td>
+      <td>${esc(f.detail)}</td></tr>`).join('')}
+    </table></div>`);
+}
+</script>
+</body>
+</html>

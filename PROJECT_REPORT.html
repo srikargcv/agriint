@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>AgriNexus Project Report</title>
+<style>
+  body { font-family: "Times New Roman", Georgia, serif; font-size: 12pt; line-height: 1.55;
+         color: #111; max-width: 700px; margin: 40px auto; padding: 0 24px; }
+  h1 { font-size: 20pt; text-align: center; margin-bottom: 2px; }
+  .sub { text-align: center; color: #444; font-size: 11pt; margin-bottom: 28px; }
+  h2 { font-size: 14pt; border-bottom: 1px solid #999; padding-bottom: 3px; margin-top: 26px; }
+  p { text-align: justify; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 11pt; }
+  td, th { border: 1px solid #bbb; padding: 5px 8px; text-align: left; }
+  th { background: #f0f0f0; }
+  .box { background: #f6f6f6; border-left: 3px solid #555; padding: 10px 14px; margin: 10px 0;
+         font-size: 11pt; }
+  ul { margin: 6px 0 6px 20px; }
+  .kpis { text-align: center; font-size: 11pt; color: #333; margin: 8px 0; }
+</style>
+</head>
+<body>
+
+<h1>AgriNexus: An Ecosystem Intelligence Prototype for Agricultural Trade</h1>
+<div class="sub">A Project Report &nbsp;·&nbsp; Agri-Tech / Supply Chain Intelligence</div>
+
+<h2>Abstract</h2>
+<p>Between the farm gate and the buyer, agricultural supply chains lose value
+through poor matching of produce to buyers, prices detached from market
+realities, routes that ignore spoilage, and fraud caught too late. AgriNexus
+is a working prototype of an <i>ecosystem intelligence layer</i> that automates
+four decisions — <b>matching</b> (which buyer gets which lot), <b>pricing</b>
+(whether an offer is fair), <b>logistics</b> (how to move produce without
+spoiling it), and <b>trust &amp; safety</b> (scoring reliability and detecting
+fraud). The four modules cooperate through a single shared <i>event stream</i>:
+every step of every decision is published as a typed event, so the modules stay
+independent, every decision is traceable, and the whole pipeline can be watched
+live. A clean web interface presents each decision in plain language and allows
+arbitrary test scenarios to be submitted, making the system demonstrable to
+technical and non-technical reviewers alike. The implementation uses only the
+Python standard library with a small sample dataset, which keeps the project
+portable, readable, and easy to evaluate end-to-end.</p>
+<p><b>Keywords:</b> matching engine, fair price banding, route optimisation,
+spoilage risk, trust scoring, fraud detection, event-driven design.</p>
+
+<h2>1. Introduction</h2>
+<p>Agri-commerce platforms connect thousands of farmers with retail, restaurant
+(HoReCa), and export buyers. Without intelligence tooling, lots are matched
+opportunistically — a buyer is found who happens to want a crop, with little
+regard for whether the price, freshness, distance, or the farmer's reliability
+make the pairing a good one. Farmers rarely know the prevailing market rate at
+nearby market yards, so offers can drift far from fair in either direction, and
+the farmer — the weakest party in the chain — usually absorbs the loss. Routes
+are planned by distance alone even when the cargo is perishable and the day is
+hot. And anomalies such as weight disappearing between pickup and delivery,
+serial order cancellations, or groups of traders selling in circles to fake
+volume are typically caught only after money has moved.</p>
+<p>The objective of this project was to design and build a compact, working
+prototype of an intelligence layer that addresses all four problems together,
+under two design constraints. First, <b>every decision must be explainable</b>:
+a reviewer should be able to see not just <i>what</i> the system decided but
+<i>why</i> — which factors pushed a match up or down, what market rate a price
+verdict was based on, why a particular vehicle was chosen. Second, the modules
+must be <b>independent</b>: they communicate only through a shared, typed event
+stream, so each module can be developed, tested, and later replaced or upgraded
+on its own without touching the others. This mirrors how real platforms evolve —
+algorithms improve module by module, not in one risky rewrite.</p>
+
+<h2>2. System Overview</h2>
+<table>
+<tr><th>Module</th><th>Question it answers</th></tr>
+<tr><td><b>Matching</b></td><td>Which buyer should get which farmer's lot?</td></tr>
+<tr><td><b>Pricing</b></td><td>Is the offered price fair to the farmer?</td></tr>
+<tr><td><b>Logistics</b></td><td>What is the cheapest trip that keeps produce fresh?</td></tr>
+<tr><td><b>Trust &amp; Fraud</b></td><td>Can this actor be trusted — and is anything suspicious?</td></tr>
+</table>
+<p>Data flows in one direction through the pipeline: farmer lots (crop,
+quantity, grade, freshness, location, asking price) and buyer orders (crop,
+quantity, maximum price, delivery hub, minimum trust requirement) enter the
+system; the matching engine pairs them subject to quality gates; each confirmed
+pair is then priced, routed, and checked for trust and fraud; and every step —
+match, price band, route plan, trust update, ledger entry, fraud flag — is
+published as an event on the shared stream. Because modules never read each
+other's internal state directly, the stream is also the system's audit trail:
+the dashboard's activity feed shows everything that happened, in order, and any
+integration problem appears immediately as a missing or malformed event.</p>
+<p>The web dashboard is the system's public face. It presents the four modules
+as stations that can each be run individually on the sample dataset, plus a
+"run the full pipeline" action, plus a test-scenario form where a reviewer
+enters a lot and an order and receives a plain-language verdict from all four
+modules at once. All numbers are shown with their meaning — a spoil chance as a
+percentage, a price verdict as FAIR or UNFAIR with the market rate beside it —
+rather than as raw scores.</p>
+
+<h2>3. Module Summaries</h2>
+<p><b>Matching.</b> Every farmer-lot/buyer-order pair is scored on five
+factors — price fit, freshness, distance, trust, and quantity fit — with the
+importance of each factor depending on the buyer type. A restaurant group
+weights freshness highest, since a wilting delivery hurts its business
+directly; an exporter weights trust highest, since its reputation rides on
+reliable partners; a retail cooperative sits between the two. Freshness is read
+from the lot's grade and its description; distance uses real coordinates
+between the farm and the buyer's delivery hub; trust is the farmer's current
+rolling score. Pairs below a quality threshold, or below the buyer's stated
+minimum trust requirement, are rejected outright — the system prefers no match
+to a bad one, which protects both sides.</p>
+<p><b>Pricing.</b> Each crop and district has a market reference rate drawn
+from published mandi (market yard) prices. The engine builds a fair band a
+little above and below that rate, adjusted for the lot's grade, the cost of
+moving the produce, and a small platform commission, so the farmer sees both
+the gross range and what lands in their hands. Offers inside the band are
+marked <i>FAIR</i>; offers outside trigger alerts in either direction —
+protecting farmers from lowball offers and buyers from gouging. A five-day
+price forecast accompanies every check, and a plain-language explanation is
+generated for the farmer ("today's market rate for your crop in your district
+is…, your fair range is…, prices are rising/softening"). This explanation slot
+is where an AI language model can later take over the wording without changing
+anything else.</p>
+<p><b>Logistics.</b> A typed vehicle fleet — small vans for light loads, pickup
+trucks for village-to-hub runs, mini trucks for mid-size loads, a 16-ton truck
+for bulk grain, and two refrigerated options — is matched to each load. Routes
+are planned to minimise not just kilometres but a spoilage-weighted cost: the
+longer a perishable sits on the road and the hotter the day, the more
+"expensive" that route becomes, so the planner naturally prefers trips that
+keep produce alive. Perishable loads in hot weather automatically receive
+refrigerated vehicles. Every trip is reported with its vehicle, pickups,
+distance, time on the road, and an explicit spoilage chance; trips whose risk
+crosses a safety line are flagged for re-planning before dispatch.</p>
+<p><b>Trust &amp; Fraud.</b> A rolling trust score for each farmer rises with
+good deliveries and decays when problems occur, and feeds back into matching —
+trustworthy farmers unlock the buyers who demand reliability. Independently,
+every lot carries a tamper-evident record of its journey from sowing through
+harvest, pickup, cold storage, and delivery; each stage is sealed against the
+previous one, so any later edit to history breaks the seal and is detectable.
+This gives buyers provenance they can check rather than promises they must
+trust. Five fraud checks run continuously: weight that shrinks between pickup
+and delivery, prices wildly off the market, serial order cancellations, trucks
+reporting far from the claimed farm, and circular trading rings in which the
+same few traders sell to each other to fake volume. Flags escalate along a
+review path — flag for review, hold settlement, escalate to manual review.</p>
+
+<h2>4. Sample Results</h2>
+<div class="kpis">Sample dataset: 8 farmers · 13 lots · 16 orders · 12 crops · 6 vehicle types</div>
+<div class="box">
+<b>Matching:</b> 9 confirmed pairs on the sample dataset; the best match paired a
+cotton lot from a Nellore farmer with an export order at a score of 0.91,
+with distance and quantity fit as the strongest factors.<br>
+<b>Pricing:</b> the majority of offers landed FAIR; asks above their fair band
+were flagged — for example A-grade cotton quoted above its computed range was
+marked UNFAIR and accompanied by an explanatory message stating the market
+rate, the fair range, and the net amount after fees.<br>
+<b>Logistics:</b> perishable loads on hot days were automatically assigned
+refrigerated trucks; a representative trip report reads "a refrigerated truck
+makes 1 pickup in Guntur — 89.7 km, about 2.3 hours on the road; chance of
+produce spoiling: 8%; fine," while an extreme long-distance perishable trip
+(over 1,200 km) pushed the spoil chance to 100% and triggered the re-planning
+flag.<br>
+<b>Trust &amp; Fraud:</b> the demo lot's five-stage journey record re-verified
+intact; a farmer's trust climbed from 0.80 to 0.88 across three good
+deliveries; and all five fraud checks were demonstrated firing on injected test
+cases, concluding with a settlement hold.
+</div>
+<p>The dashboard's test-scenario form extends these results to arbitrary
+inputs. Varying one field at a time makes the models' behaviour visible:
+raising the asking price above the buyer's maximum erodes the price-fit factor
+until the match flips to rejected; choosing a far-away delivery district raises
+both the distance penalty and the spoilage risk; forcing a non-refrigerated
+vehicle onto a long, hot, perishable run pushes the spoil chance upward and
+changes the trip's status; and entering mismatched pickup and delivery weights,
+or a GPS point far from the farm, produces the corresponding fraud warning in
+the verdict.</p>
+
+<h2>5. Testing</h2>
+<p>Testing followed two tracks. Unit-level tests exercised the matching engine's
+edge cases — a no-match case, threshold rejection, and the minimum-trust gate —
+confirming that each protection fires exactly when it should. System-level
+tests ran the full pipeline and the custom-scenario form through the browser
+interface, checking that every module renders correct results and that every
+step appears on the activity feed.</p>
+<table>
+<tr><th>Test</th><th>Outcome</th></tr>
+<tr><td>No-match case (different crops)</td><td>No matches returned</td></tr>
+<tr><td>Extreme overpricing</td><td>Match rejected by quality threshold</td></tr>
+<tr><td>Trust below buyer's minimum</td><td>Rejected; passes once trust is raised</td></tr>
+<tr><td>Offer below floor / above ceiling</td><td>UNFAIR verdict with alert</td></tr>
+<tr><td>Perishable load in 33&nbsp;°C weather</td><td>Refrigerated vehicle auto-selected</td></tr>
+<tr><td>Very long perishable trip</td><td>Flagged for re-planning</td></tr>
+<tr><td>Ledger re-verification after edits</td><td>Chain intact; tampering detectable</td></tr>
+<tr><td>All five fraud rules</td><td>All fire on injected cases; settlement held</td></tr>
+<tr><td>Full pipeline via web interface</td><td>All modules render; activity feed complete</td></tr>
+</table>
+<p>All tests pass deterministically on the sample dataset, and the custom form
+was additionally exercised with fair and unfair inputs in each module to
+confirm the verdicts flip as expected.</p>
+
+<h2>6. Limitations and Future Scope</h2>
+<p>The prototype deliberately trades scale for clarity. It uses a small sample
+dataset rather than live market feeds; its matching and routing algorithms are
+simple, explainable heuristics rather than globally optimal solvers; event
+history is held for the session rather than persisted to a database; and the
+web interface is intended for local, trusted use without authentication.
+Farmer-facing explanations are template-generated, with a clearly marked place
+where an AI language model can take over the wording later.</p>
+<p>Each limitation has a natural upgrade path. Live market rates can replace the
+sample rates through government price APIs. Matching can move to a globally
+optimal assignment algorithm, and routing to a full vehicle-routing optimiser
+with time windows, both behind the same module interfaces. The event stream can
+be backed by a durable message log for analytics and audit. Authentication and
+role-based access can be added ahead of any multi-user deployment. And the
+fraud layer can grow graph analytics over the complete trader network as real
+transaction history accumulates.</p>
+
+<h2>7. Conclusion</h2>
+<p>AgriNexus shows that the four intelligence problems of an agri-commerce
+platform — matching, pricing, logistics, and trust — can be unified behind a
+single event contract and built as small, explainable, independently testable
+modules. The resulting prototype is fully working and demonstrable through its
+web interface; every decision a reviewer sees can be traced back to the factors
+and events that produced it. Just as importantly, the architecture anticipates
+its own growth: stronger algorithms, live data feeds, persistence, and AI-
+drafted explanations can each be adopted module by module, without reworking
+the system — which is precisely how production platforms evolve.</p>
+
+<h2>8. References</h2>
+<ul>
+<li>Agmarknet — Agricultural Marketing Information Network, Directorate of Marketing &amp; Inspection, Ministry of Agriculture, Government of India (market reference rates).</li>
+<li>GeoNames geographical database (town and city coordinates).</li>
+<li>Kuhn, H. W. (1955). The Hungarian Method for the Assignment Problem, <i>Naval Research Logistics Quarterly</i>.</li>
+<li>Toth, P., &amp; Vigo, D. (2014). <i>Vehicle Routing: Problems, Methods, and Applications</i>, SIAM.</li>
+</ul>
+
+</body>
+</html>
